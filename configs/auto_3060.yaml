@@ -1,0 +1,99 @@
+project:
+  name: anti_fragile_segmentation
+paths:
+  data_root: C:\Users\Mohit\Downloads\Offroad_Segmentation_Training_Dataset
+  train_images: C:\Users\Mohit\Downloads\Offroad_Segmentation_Training_Dataset\val\Color_Images
+  train_masks: C:\Users\Mohit\Downloads\Offroad_Segmentation_Training_Dataset\val\Segmentation
+  val_images: C:\Users\Mohit\Downloads\Offroad_Segmentation_Training_Dataset\val\Color_Images
+  val_masks: C:\Users\Mohit\Downloads\Offroad_Segmentation_Training_Dataset\val\Segmentation
+  test_images: C:\Users\Mohit\Downloads\Offroad_Segmentation_testImages\Offroad_Segmentation_testImages\Color_Images
+  test_masks: C:\Users\Mohit\Downloads\Offroad_Segmentation_testImages\Offroad_Segmentation_testImages\Segmentation
+  output_dir: D:\2025-Projects\Autonomous-Vehicle\configs\outputs
+dataset:
+  mask_mode: grayscale
+  color_map: null
+  label_map:
+  - 100
+  - 200
+  - 300
+  - 500
+  - 550
+  - 600
+  - 700
+  - 800
+  - 7100
+  - 10000
+  train_profile: light
+  max_samples: null
+  patch_size:
+  - 320
+  - 320
+  crop_scale:
+  - 0.6
+  - 1.0
+  mean:
+  - 0.485
+  - 0.456
+  - 0.406
+  std:
+  - 0.229
+  - 0.224
+  - 0.225
+  multi_scale_sizes: null
+  image_exts:
+  - .png
+  - .jpg
+  - .jpeg
+  mask_exts:
+  - .png
+  - .jpg
+  - .jpeg
+model:
+  name: unet
+  in_channels: 3
+  num_classes: 10
+  features:
+  - 32
+  - 64
+  - 128
+  - 256
+  residual: false
+  dropout: 0.0
+train:
+  batch_size: 1
+  num_workers: 0
+  num_epochs: 80
+  lr: 0.0002
+  weight_decay: 0.0001
+  seed: 42
+  device: cuda
+  image_size:
+  - 320
+  - 320
+  lr_scheduler: cosine
+  mixed_precision: true
+  grad_accum: 8
+  log_class_iou: true
+  log_class_dist: true
+loss:
+  ce_weight: 1.0
+  dice_weight: 1.0
+  focal_weight: 0.5
+  focal_gamma: 2.0
+  auto_class_weights: true
+  class_weighting: median_freq
+  weight_samples: null
+  max_class_weight: 8.0
+  ignore_index: -100
+consistency:
+  enabled: false
+  weight: 0.2
+hard_mining:
+  enabled: false
+  top_k: 0.2
+tta:
+  enabled: false
+  mode: flip
+test:
+  log_class_iou: true
+  log_class_dist: true

@@ -1,0 +1,53 @@
+project:
+  name: anti_fragile_segmentation
+paths:
+  data_root: "C:/Users/Mohit/Downloads/Offroad_Segmentation_Training_Dataset"
+  train_images: "C:/Users/Mohit/Downloads/Offroad_Segmentation_Training_Dataset/train/Color_Images"
+  train_masks: "C:/Users/Mohit/Downloads/Offroad_Segmentation_Training_Dataset/train/Segmentation"
+  val_images: "C:/Users/Mohit/Downloads/Offroad_Segmentation_Training_Dataset/val/Color_Images"
+  val_masks: "C:/Users/Mohit/Downloads/Offroad_Segmentation_Training_Dataset/val/Segmentation"
+  test_images: "C:/Users/Mohit/Downloads/Offroad_Segmentation_testImages/Offroad_Segmentation_testImages/Color_Images"
+  test_masks: "C:/Users/Mohit/Downloads/Offroad_Segmentation_testImages/Offroad_Segmentation_testImages/Segmentation"
+  output_dir: outputs
+  
+dataset:
+  mask_mode: grayscale  # auto | grayscale | color
+  color_map: null  # list of RGB triplets, e.g. [[0,0,0],[128,0,0],...]
+  label_map: [100, 200, 300, 500, 550, 600, 700, 800, 7100, 10000]
+  max_samples: null
+  image_exts: [".png", ".jpg", ".jpeg"]
+  mask_exts: [".png", ".jpg", ".jpeg"]
+model:
+  name: unet
+  in_channels: 3
+  num_classes: 10
+train:
+  batch_size: 2
+  num_workers: 0
+  num_epochs: 50
+  lr: 0.0003
+  weight_decay: 0.0001
+  seed: 42
+  device: cuda
+  image_size: [256, 256]
+  lr_scheduler: cosine
+  log_class_iou: true
+  log_class_dist: true
+loss:
+  ce_weight: 1.0
+  dice_weight: 1.0
+  focal_weight: 0.0
+  auto_class_weights: true
+  class_weighting: median_freq
+  max_class_weight: 10.0
+  ignore_index: -100
+consistency:
+  enabled: true
+  weight: 0.2
+hard_mining:
+  enabled: true
+  top_k: 0.2
+tta:
+  enabled: true
+  steps: 4
+  lr: 0.0001
