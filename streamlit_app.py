@@ -557,19 +557,20 @@ with tab3:
         from src.models.factory import build_model
         from src.data.transforms import build_eval_transforms
         from src.utils.config import load_config, resolve_paths
+        from src.training.checkpointing import load_checkpoint
 
         img_bytes = np.frombuffer(seg_file.read(), np.uint8)
         img_bgr   = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
         img_rgb   = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
         with st.spinner("Running segmentation..."):
-            cfg    = resolve_paths(load_config(str(config_path)), str(config_path.parent))
+            cfg    = resolve_paths(load_config(str(config_path)), ROOT)
             cfg    = set_inference_model_defaults(cfg)
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
             if "seg_model" not in st.session_state or st.session_state.get("seg_ckpt") != str(ckpt_path):
                 model = build_model(cfg).to(device)
-                model.load_state_dict(torch.load(str(ckpt_path), map_location=device, weights_only=True)["model"])
+                load_checkpoint(str(ckpt_path), model=model, device=device, prefer_ema=True)
                 model.eval()
                 st.session_state["seg_model"] = model
                 st.session_state["seg_ckpt"]  = str(ckpt_path)

@@ -63,6 +63,74 @@ python scripts/evaluate.py --config configs/default.yaml --checkpoint outputs/ch
 python scripts/tta.py --config configs/default.yaml --checkpoint outputs/checkpoints/best.pth
 ```
 
+## High-Performance DeepLabV3+ Preset
+Use the production-focused config for stronger quality/cost balance:
+
+```bash
+python scripts/train.py --config configs/prod_deeplabv3plus.yaml
+python scripts/evaluate.py --config configs/prod_deeplabv3plus.yaml --checkpoint outputs/deeplabv3plus_prod/checkpoints/best.pth --use-ema
+```
+
+Resume training from `last.pth`:
+
+```bash
+python scripts/train.py --config configs/prod_deeplabv3plus.yaml --resume outputs/deeplabv3plus_prod/checkpoints/last.pth
+```
+
+## DeepLabV3+ ResNet-50 (Production)
+Dedicated ResNet-50 config:
+
+```bash
+python scripts/train.py --config configs/deeplabv3plus_resnet50.yaml
+python scripts/evaluate.py --config configs/deeplabv3plus_resnet50.yaml --checkpoint outputs/deeplabv3plus_resnet50/checkpoints/best.pth --use-ema
+```
+
+## Automated Sweep (DeepLabV3+ ResNet-50)
+Run hyperparameter sweep until target metrics are met or trials are exhausted:
+
+```bash
+python scripts/sweep_deeplab_resnet50.py \
+  --base-config configs/deeplabv3plus_resnet50.yaml \
+  --target-miou 0.8 \
+  --target-map50 0.8 \
+  --num-epochs 60 \
+  --max-trials 24
+```
+
+Sweep outputs are written under `outputs/sweeps/...` with `summary.json` and `summary.csv`.
+
+## ONNX Export + Cost Benchmark
+Install optional ONNX dependencies:
+
+```bash
+pip install -r requirements-onnx.txt
+```
+
+Export checkpoint to ONNX:
+
+```bash
+python scripts/export_onnx.py \
+  --config configs/deeplabv3plus_resnet50.yaml \
+  --checkpoint outputs/deeplabv3plus_resnet50/checkpoints/best.pth \
+  --output models/deeplabv3plus_resnet50.onnx \
+  --use-ema \
+  --dynamic
+```
+
+Benchmark PyTorch vs ONNX Runtime:
+
+```bash
+python scripts/benchmark_inference.py \
+  --config configs/deeplabv3plus_resnet50.yaml \
+  --checkpoint outputs/deeplabv3plus_resnet50/checkpoints/best.pth \
+  --onnx models/deeplabv3plus_resnet50.onnx \
+  --device cpu \
+  --batch-size 1 \
+  --height 384 --width 384 \
+  --iters 200 \
+  --out-json outputs/benchmarks/deeplabv3plus_resnet50_cpu.json
+```
+
 ## Data Layout
 Images and masks must share filenames (different extensions allowed).
 
