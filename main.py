@@ -2,13 +2,13 @@ from src.utils.weights import compute_class_weights
 from src.utils.seed import set_seed
 from src.utils.logging import create_logger
 from src.utils.config import load_config, resolve_paths
+from src.utils.validation import validate_config
 from src.training.trainer import Trainer
 from src.training.metrics import confusion_matrix, metrics_from_confusion
 from src.models.factory import build_model
 from src.data.transforms import build_train_transforms, build_eval_transforms
 from src.data.datasets import SegmentationDataset
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
@@ -58,12 +58,15 @@ def _build_loader(
         label_map=dataset_cfg["label_map"],
         max_samples=dataset_cfg["max_samples"],
     )
+    num_workers = int(cfg["train"]["num_workers"])
+    pin_memory = bool(torch.cuda.is_available() and str(cfg["train"].get("device", "cpu")).startswith("cuda"))
     return DataLoader(
         dataset,
         batch_size=cfg["train"]["batch_size"],
         shuffle=shuffle,
-        num_workers=cfg["train"]["num_workers"],
-        pin_memory=True,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=num_workers > 0,
     )
 
 
@@ -222,6 +225,7 @@ def test(cfg: dict, checkpoint_path: Path, logger) -> float:
 
     cm = torch.zeros((cfg["model"]["num_classes"],
                      cfg["model"]["num_classes"]), dtype=torch.int64)
+    ignore_index = cfg.get("loss", {}).get("ignore_index")
     tta_cfg = cfg.get("tta", {})
     tta_enabled = tta_cfg.get("enabled", False)
     tta_mode = tta_cfg.get("mode", "flip")
@@ -233,8 +237,12 @@ def test(cfg: dict, checkpoint_path: Path, logger) -> float:
         else:
             logits = _forward_logits(model, images)
         preds = torch.argmax(logits, dim=1)
-        cm += confusion_matrix(preds.cpu(), masks.cpu(),
-                               cfg["model"]["num_classes"])
+        cm += confusion_matrix(
+            preds.cpu(),
+            masks.cpu(),
+            cfg["model"]["num_classes"],
+            ignore_index=ignore_index,
+        )
 
     metrics = metrics_from_confusion(cm)
     logger.info(
@@ -266,9 +274,10 @@ def main() -> None:
                         help="Override device (e.g. cpu, cuda, cuda:0)")
     args = parser.parse_args()
 
-    cfg = resolve_paths(load_config(args.config), os.path.dirname(args.config))
+    cfg = resolve_paths(load_config(args.config), ROOT)
     if args.device:
         cfg["train"]["device"] = args.device
+    warnings = validate_config(cfg, require_data_paths=True)
 
     output_dir = Path(cfg["paths"]["output_dir"])
     log_dir = output_dir / "logs"
@@ -277,6 +286,8 @@ def main() -> None:
     log_file = log_dir / f"run_{timestamp}.log"
     logger = create_logger(log_file=str(log_file))
     logger.info(f"Log file: {log_file}")
+    for warning in warnings:
+        logger.warning(f"Config warning: {warning}")
 
     if not args.train and not args.test:
         args.train = True
