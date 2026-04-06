@@ -2,7 +2,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-*.log
+
 *.tmp
 *.swp
 .venv/
@@ -12,10 +12,8 @@ Auto/
 wheels/
 .pytest_cache/
 .mypy_cache/
-outputs/
 data/
 models/
-*.pth
 *.ckpt
 *.onnx
 *.zip
