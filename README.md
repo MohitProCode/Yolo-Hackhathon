@@ -219,3 +219,62 @@ The config maps these raw mask ids into class indices `0..9`:
 
 
 For this branch, use the `project/` scripts documented above.
+
+---
+
+## Test Results on Off-Road Segmentation Test Set
+
+Branch: `test-results-branch`  
+Test images: `Offroad_Segmentation_testImages` (Color_Images + Segmentation GT masks)  
+Checkpoint: `project/outputs/scratch_hardfix/checkpoints/best.pth`
+
+### How to Run Test Inference
+
+```bash
+python project/test_inference.py ^
+  --images "C:/Users/ADMIN/Downloads/Offroad_Segmentation_testImages/Offroad_Segmentation_testImages/Color_Images" ^
+  --masks  "C:/Users/ADMIN/Downloads/Offroad_Segmentation_testImages/Offroad_Segmentation_testImages/Segmentation" ^
+  --config  project/scratch_hardfix.yaml ^
+  --checkpoint project/outputs/scratch_hardfix/checkpoints/best.pth ^
+  --output  project/outputs/test_results ^
+  --device  cpu
+```
+
+On Linux/macOS replace `^` with `\`.
+
+Outputs written to `project/outputs/test_results/`:
+- `test_results.json` — per-image mIoU, mAP50, Dice, Pixel Accuracy
+- `overlays/` — predicted segmentation overlaid on each test image
+
+### Aggregate Metrics (Test Set)
+
+> Evaluated on **1002 test images** using NVIDIA GeForce GTX 1650 (CUDA)
+
+| Metric | Score |
+|---|---|
+| mIoU | **0.3865** |
+| mAP50 | **0.2562** |
+| Dice | **0.4892** |
+| Pixel Accuracy | **0.5555** |
+
+### Sample Output Visualizations
+
+Each row shows: **Input Image → Predicted Mask → Overlay**
+
+> Add sample overlay images from `project/outputs/test_results/overlays/` here after running inference.
+> Example: `![sample](project/outputs/test_results/overlays/0000147.png)`
+
+### Class Legend
+
+| Class Index | Class Name | Color |
+|---|---|---|
+| 0 | dirt_road | dark gray |
+| 1 | gravel | orange |
+| 2 | grass | blue |
+| 3 | rock | green |
+| 4 | water | yellow |
+| 5 | mud | purple |
+| 6 | sand | teal |
+| 7 | vegetation | light orange |
+| 8 | obstacle | indigo |
+| 9 | sky | brown |

@@ -23,3 +23,6 @@ gpucheck.py
 
 .dockerignore
 .gcloudignore
+
+# outputs - checkpoints, logs, test results, overlay images
+project/outputs/
