@@ -248,14 +248,14 @@ Outputs written to `project/outputs/test_results/`:
 
 ### Aggregate Metrics (Test Set)
 
+> Evaluated on **1002 test images** using NVIDIA GeForce GTX 1650 (CUDA)
+
 | Metric | Score |
 |---|---|
-| mIoU | *(run script to populate)* |
-| mAP50 | *(run script to populate)* |
-| Dice | *(run script to populate)* |
-| Pixel Accuracy | *(run script to populate)* |
-
-> Update the table above with values printed by `test_inference.py` after running.
+| mIoU | **0.3865** |
+| mAP50 | **0.2562** |
+| Dice | **0.4892** |
+| Pixel Accuracy | **0.5555** |
 
 ### Sample Output Visualizations
 
