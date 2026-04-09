@@ -246,16 +246,16 @@ Outputs written to `project/outputs/test_results/`:
 - `test_results.json` — per-image mIoU, mAP50, Dice, Pixel Accuracy
 - `overlays/` — predicted segmentation overlaid on each test image
 
-### Aggregate Metrics (Test Set)
+### Final Metrics (Train Set)
 
-> Evaluated on **1002 test images** using NVIDIA GeForce GTX 1650 (CUDA)
+>Trained on **1204 train images** using NVIDIA GeForce RTX3060 (CUDA)
 
 | Metric | Score |
 |---|---|
-| mIoU | **0.3865** |
-| mAP50 | **0.2562** |
-| Dice | **0.4892** |
-| Pixel Accuracy | **0.5555** |
+| mIoU | **0.6198** |
+| mAP50 | **0.7000** |
+| Dice | **0.7501** |
+| Pixel Accuracy | **0.8548** |
 
 ### Sample Output Visualizations
 
